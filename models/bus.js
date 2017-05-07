@@ -8,7 +8,8 @@ module.exports = function(sequelize, DataTypes) {
     }, {
         classMethods: {
             associate: function(models) {
-
+                Model.belongsTo(models.route)
+                models.route.hasMany(Model)
             }
         }
     });
