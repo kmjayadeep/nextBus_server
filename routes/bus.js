@@ -54,7 +54,7 @@ router.post('/find', (req, res) => {
             })
         })
         .then(routesData => {
-            let routes = routesData.filter(ro => {
+            var routes = routesData.filter(ro => {
                 if (ro.busStops.length < 2)
                     return false
                 if (ro.busStops[0].routeBusStop.id < ro.busStops[1].routeBusStop.id && ro.busStops[0].id == source.id)
@@ -63,7 +63,7 @@ router.post('/find', (req, res) => {
                     return true
                 return false
             })
-            let routeIds = _.pluck(routes, 'id')
+            var routeIds = _.pluck(routes, 'id')
             return models.bus.findAll({
                 where: {
                     routeId: {
