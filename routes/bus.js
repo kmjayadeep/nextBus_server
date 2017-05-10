@@ -80,6 +80,8 @@ router.post('/find', (req, res) => {
                     var values = snapshot.val()
                     resolve(values)
 
+                }, (err) => {
+                    reject(err)
                 })
             })
         })
@@ -91,35 +93,36 @@ router.post('/find', (req, res) => {
             })
             var locations = _.pluck(busLoc, 'location')
             var origins = locations.map(location => {
-                    return location.lat + ',' + location.long
+                    if (location)
+                        return location.lat + ',' + location.long
                 })
                 .join('|')
-            // var destinations = locations.map(l => {
-            //     return src[0] + ',' + src[1]
-            // }).join('|')
-            var destinations = src[0]+','+src[1]
+            console.log(origins)
+                // var destinations = locations.map(l => {
+                //     return src[0] + ',' + src[1]
+                // }).join('|')
+            var destinations = src[0] + ',' + src[1]
             console.log('json?origins=' + origins + '&destinations=' + destinations)
             return client.get('json?origins=' + origins + '&destinations=' + destinations)
-        }).then(data=>{
-        	if(data&&data.body&&data.body.status=='OK'){
-        		// res.json(data.body.rows)
-        		for(var i=0;i<data.body.rows.length;i++){
-        			var elements = data.body.rows[i].elements
-        			console.log(elements)
-        			busesData[i] = busesData[i].toJSON()
-        			busesData[i].estimation  = {
-        				distance : elements[0].distance.text,
-        				duration: elements[0].duration.text
-        			}
-        		}
-        		res.json(busesData)
-        	}
-        	else
-        		return res.status(400).json('error')
+        }).then(data => {
+            if (data && data.body && data.body.status == 'OK') {
+                // res.json(data.body.rows)
+                for (var i = 0; i < data.body.rows.length; i++) {
+                    var elements = data.body.rows[i].elements
+                    console.log(elements)
+                    busesData[i] = busesData[i].toJSON()
+                    busesData[i].estimation = {
+                        distance: elements[0].distance.text,
+                        duration: elements[0].duration.text
+                    }
+                }
+                res.json(busesData)
+            } else
+                return res.status(400).json('error')
         })
-        .catch(err => {
-            res.status(400).json(err)
-        })
+        // .catch(err => {
+        //     res.status(400).json(err)
+        // })
 })
 
 module.exports = router;
